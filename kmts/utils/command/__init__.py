@@ -158,6 +158,7 @@ def savePermissionFile(source: CommandSource, _):
     if gctx.saveLock.acquire(False):
         writeFile()
         gctx.saveLock.release()
+        source.reply(RText("成功保存权限文件。", RColor.green))
     else:
         source.reply(RText("锁被占用了，可能正在进行自动保存。", RColor.red))
 
