@@ -8,7 +8,8 @@ from mcdreforged.minecraft.rtext.style import RColor
 from .classes import upgradeRequest
 
 from ...shared import gctx
-from ..misc.misc import getOnlinePlayers
+from ..permissionUtils.point import getUpgradeCost, getUpgradeAddInt, canUpgrade, getPointName
+from ..configUtils import readPlayerInfo, Player
 
 
 def printHelp(source: CommandSource, context: CommandContext):
@@ -21,10 +22,17 @@ def printHelp(source: CommandSource, context: CommandContext):
 !!ts: 输出本条消息
 !!ts upgrade <玩家名称>: 升级某个玩家，同时消耗你的信任点数''')
 
-    body2 = RText("您的信息: ", RColor.dark_purple) + RText(f'''
-名称: undefined
-等级: undefined
-剩余信任点: undefined
+    if not source.is_console:
+        try:
+            player = readPlayerInfo(source.player)
+        except:
+            player = Player(source.player, False, 0)
+    else:
+        player = Player("<Console>", True, 999)
+    body2 = RText("< ") + RText("您的信息 ", RColor.dark_purple) + RText(" >") + RText(f'''
+名称: {source.player}
+等级: {getPointName(player)}
+剩余信任点: {player.trustPoint}
 可用命令列表:
 ''')
 
@@ -44,24 +52,51 @@ def upgradePlayer(source: CommandSource, context: CommandContext):
     if alreadyExistRequest:
         source.reply(RText(f"您已经请求升级 {alreadyExistRequest.targetPlayer}，但是您又运行了这个命令，所以上个请求将被忽略。", RColor.green))
 
-    print(getOnlinePlayers())
-    if not context['playerName'] in getOnlinePlayers():
-        source.reply(RText(f"您请求升级的 {context['playerName']} 不在线！", RColor.red))
+    if source.is_player:
+        if source.player == context['playerName']:
+            source.reply(RText("您不能升级自己！", RColor.red))
+            try:
+                del gctx.playerUpgradeAwaits[playerStorageName]
+            except KeyError:
+                pass
+            finally:
+                return
+
+        try:
+            player = readPlayerInfo(source.player)
+        except KeyError:
+            source.reply(RText("您为1级玩家，无法升级！", RColor.red))
+            return
+        if not canUpgrade(player):
+            source.reply(RText("您的信任点不足，无法升级！", RColor.red))
+            return
+
+        req = upgradeRequest(playerStorageName, context['playerName'], getUpgradeCost(player), getUpgradeAddInt(player))
+        source.reply(f"您将花费{req.cost}信任点以为 {context['playerName']} 增加{req.add}信任点。确认请输入`!!ts confirm`")
+        gctx.playerUpgradeAwaits[playerStorageName] = req
+    elif source.is_console:
+        source.reply(f"以控制台执行的upgrade子命令将以根玩家的权限执行(为目标增加17点数)。确认请输入`!!ts confirm`")
+
+
+def playerUpgradeConfirm(source: CommandSource, context: CommandContext):
+    playerStorageName = None
+    if source.is_console:
+        playerStorageName = "<Console>"
+    else:
+        playerStorageName = source.player
+
+    alreadyExistRequest: upgradeRequest = gctx.playerUpgradeAwaits.get(playerStorageName, None)
+
+    if not alreadyExistRequest:
+        source.reply(RText("您还没有发出升级请求！", RColor.red))
+    else:
         try:
             del gctx.playerUpgradeAwaits[playerStorageName]
         except KeyError:
             pass
-        return
 
-    if source.is_player:
-        source.reply(f"您将花费undefined信任点以为undefined增加undefined信任点。确认请输入`!!ts confirm`")
-        gctx.playerUpgradeAwaits[playerStorageName] = upgradeRequest(playerStorageName, context['playerName'], 1)
-    elif source.is_console:
-        source.reply("以控制台执行的upgrade子命令将以根玩家的权限执行(为目标增加...点数)。确认请输入`!!ts confirm`")
-
-
-def playerUpgradeConfirm(source: CommandSource, context: CommandContext):
-    pass
+        source.reply(RText(
+            f"正在为玩家 {alreadyExistRequest.targetPlayer} 升级，您减少了 {alreadyExistRequest.cost} 信任点，对方增加了 {alreadyExistRequest.add} 信任点。", RColor.green))
 
 
 def playerPointSet(source: CommandSource, context: CommandContext):

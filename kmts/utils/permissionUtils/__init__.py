@@ -1,3 +1,4 @@
 #
 
-def setPermissionLevelForPlayer()
+def setPermissionLevelForPlayer(playerName, targetLevel):
+    pass

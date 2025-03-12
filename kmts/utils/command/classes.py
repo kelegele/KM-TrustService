@@ -6,3 +6,4 @@ class upgradeRequest:
     requestPlayer: str
     targetPlayer: str
     cost: int
+    add: int
