@@ -20,7 +20,7 @@ def getUpgradeCost(player: Player) -> int:
 
 def getUpgradeAddInt(player: Player) -> int:
     if player.isRootPlayer:
-        return 0
+        return 16
     elif player.trustPoint == 0:
         return False
     else:

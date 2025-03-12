@@ -9,7 +9,7 @@ from .classes import upgradeRequest
 
 from ...shared import gctx
 from ..permissionUtils.point import getUpgradeCost, getUpgradeAddInt, canUpgrade, getPointName
-from ..configUtils import readPlayerInfo, Player
+from ..configUtils import readPlayerInfo, Player, savePlayerInfo
 
 
 def printHelp(source: CommandSource, context: CommandContext):
@@ -97,6 +97,26 @@ def playerUpgradeConfirm(source: CommandSource, context: CommandContext):
 
         source.reply(RText(
             f"正在为玩家 {alreadyExistRequest.targetPlayer} 升级，您减少了 {alreadyExistRequest.cost} 信任点，对方增加了 {alreadyExistRequest.add} 信任点。", RColor.green))
+
+        # 升级逻辑
+        # 先写原玩家
+        try:
+            player1 = readPlayerInfo(alreadyExistRequest.requestPlayer)
+        except:
+            source.reply(RText("升级失败", RColor.red))
+            return
+        player1.trustPoint -= alreadyExistRequest.cost
+        savePlayerInfo(player1)
+
+        # 然后给target增加
+        try:
+            player2 = readPlayerInfo(alreadyExistRequest.targetPlayer)
+        except:
+            player2 = Player(alreadyExistRequest.targetPlayer, False, 0)
+        player2.trustPoint = min(player2.trustPoint+alreadyExistRequest.add, 27)
+        savePlayerInfo(player2)
+
+        source.reply(RText("升级成功", RColor.green))
 
 
 def playerPointSet(source: CommandSource, context: CommandContext):

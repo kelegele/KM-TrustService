@@ -16,6 +16,8 @@ def on_load(server: PluginServerInterface, _):
     initCommandSystem(server)
 
     readFile()
+    server.logger.info(
+        f"Success load permission file with {len(gctx.playerLevelsConfigFileContent['players'])} players.")
 
 
 def on_unload(server: PluginServerInterface):
