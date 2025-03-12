@@ -11,6 +11,7 @@ from ...shared import gctx
 from ..permissionUtils.point import getUpgradeCost, getUpgradeAddInt, canUpgrade, getPointName
 from ..permissionUtils import updateAllPermissions
 from ..configUtils import readPlayerInfo, Player, savePlayerInfo
+from ..configUtils import writeFile
 
 
 def printHelp(source: CommandSource, context: CommandContext):
@@ -150,12 +151,24 @@ def playerPointSet(source: CommandSource, context: CommandContext):
     updateAllPermissions()
 
 
+def savePermissionFile(source: CommandSource, _):
+    if not source.has_permission_higher_than(2):
+        source.reply(RText("你没有权限执行这个操作！", RColor.red))
+        return
+    if gctx.saveLock.acquire(False):
+        writeFile()
+        gctx.saveLock.release()
+    else:
+        source.reply(RText("锁被占用了，可能正在进行自动保存。", RColor.red))
+
+
 def getTSCmdBuilder():
     cmdBuilder = SimpleCommandBuilder()
 
     cmdBuilder.command("!!ts", printHelp)
     cmdBuilder.command("!!ts upgrade <playerName>", upgradePlayer)
     cmdBuilder.command("!!ts confirm", playerUpgradeConfirmWrapper)
+    cmdBuilder.command("!!ts save", savePermissionFile)
 
     cmdBuilder.command("!!ts setPoint <playerName> <point>", playerPointSet)
 
