@@ -32,7 +32,6 @@ def savePlayerInfo(playerInfo: Player) -> None:
 
 def readFile():  # 插件加载时调用
     PSI: PluginServerInterface = ServerInterface.psi()
-    print(PSI)
     cfg = PSI.load_config_simple("permission.json", defaultPermissionFile)
     gctx.playerLevelsConfigFileContent = cfg
 
