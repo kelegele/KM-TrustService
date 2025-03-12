@@ -1,0 +1,11 @@
+{
+    "id": "kmts",
+    "version": "1.0.0",
+    "name": "KeleMC Trust Serivce and Carpet command redirect",
+    "description": "KeleMC Trust Serivce and Carpet command redirect",
+    "author": "wangyupu",
+    "link": "https://github.com/KeleMC/kmts",
+    "dependencies": {
+        "mcdreforged": ">=2.0.0-alpha.1"
+    }
+}
