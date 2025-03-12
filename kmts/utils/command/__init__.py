@@ -9,6 +9,7 @@ from .classes import upgradeRequest
 
 from ...shared import gctx
 from ..permissionUtils.point import getUpgradeCost, getUpgradeAddInt, canUpgrade, getPointName
+from ..permissionUtils import updateAllPermissions
 from ..configUtils import readPlayerInfo, Player, savePlayerInfo
 
 
@@ -33,7 +34,7 @@ def printHelp(source: CommandSource, context: CommandContext):
 名称: {source.player}
 等级: {getPointName(player)}
 剩余信任点: {player.trustPoint}
-可用命令列表:
+当前MCDR权限级别: {source.get_server().get_instance().get_permission_level(source)}
 ''')
 
     final = title + nextLine + body + nextLine + body2
@@ -99,29 +100,54 @@ def playerUpgradeConfirm(source: CommandSource, context: CommandContext):
             f"正在为玩家 {alreadyExistRequest.targetPlayer} 升级，您减少了 {alreadyExistRequest.cost} 信任点，对方增加了 {alreadyExistRequest.add} 信任点。", RColor.green))
 
         # 升级逻辑
-        # 先写原玩家
+        # 先获得两个玩家对象
+        try:
+            player2 = readPlayerInfo(alreadyExistRequest.targetPlayer)
+        except:
+            player2 = Player(alreadyExistRequest.targetPlayer, False, 0)
+
         try:
             player1 = readPlayerInfo(alreadyExistRequest.requestPlayer)
         except:
             source.reply(RText("升级失败", RColor.red))
             return
+
+        # 检查玩家2
+        if player2.isRootPlayer:
+            source.reply(RText("不能给根玩家升级", RColor.red))
+            return
+
+        # 然后先扣钱
         player1.trustPoint -= alreadyExistRequest.cost
         savePlayerInfo(player1)
 
         # 然后给target增加
-        try:
-            player2 = readPlayerInfo(alreadyExistRequest.targetPlayer)
-        except:
-            player2 = Player(alreadyExistRequest.targetPlayer, False, 0)
         player2.trustPoint = min(player2.trustPoint+alreadyExistRequest.add, 27)
         savePlayerInfo(player2)
 
-        source.reply(RText("升级成功", RColor.green))
+        source.reply(RText(f"升级成功，对方现有 {player2.trustPoint} 信任点。", RColor.green))
+        source.get_server().tell(alreadyExistRequest.targetPlayer, RText(
+            f"{alreadyExistRequest.requestPlayer} 花费了 {alreadyExistRequest.cost}点信任点 给您 {alreadyExistRequest.add} 信任点。", RColor.green))
+
+        # 更新权限
+        updateAllPermissions()
+
+
+def playerUpgradeConfirmWrapper(*args, **kwargs):  # 方便后面加守卫语句
+    gctx.upgradeProcessing.acquire()
+    playerUpgradeConfirm(*args, **kwargs)
+    gctx.upgradeProcessing.release()
 
 
 def playerPointSet(source: CommandSource, context: CommandContext):
     if not source.has_permission_higher_than(3):
         source.reply(RText("你没有权限执行这个操作！", RColor.red))
+        return
+    player = Player(context['playerName'], False, context['point'])
+    savePlayerInfo(player)
+    source.reply(RText(f"成功将玩家 {context['playerName']} 的点数设置为 {context['point']}", RColor.red))
+
+    updateAllPermissions()
 
 
 def getTSCmdBuilder():
@@ -129,7 +155,7 @@ def getTSCmdBuilder():
 
     cmdBuilder.command("!!ts", printHelp)
     cmdBuilder.command("!!ts upgrade <playerName>", upgradePlayer)
-    cmdBuilder.command("!!ts confirm", playerUpgradeConfirm)
+    cmdBuilder.command("!!ts confirm", playerUpgradeConfirmWrapper)
 
     cmdBuilder.command("!!ts setPoint <playerName> <point>", playerPointSet)
 
@@ -143,6 +169,5 @@ def initCommandSystem(serverInstance):
     getTSCmdBuilder().register(serverInstance)
     serverInstance.register_help_message("!!ts", "KeleMC 玩家信任服务")
     serverInstance.register_help_message("!!ts upgrade", "消耗自身点数升级某人")
-    serverInstance.register_help_message("!!ts setPoint", "设置某人权限", 4)
 
     serverInstance.logger.info("成功注册命令")

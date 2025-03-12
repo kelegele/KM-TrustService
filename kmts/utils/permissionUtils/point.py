@@ -31,10 +31,12 @@ def getUpgradeAddInt(player: Player) -> int:
             case p if 14 <= p <= 27:
                 return 7
             case p if p > 27:
-                return 16
+                return 8
 
 
 def canUpgrade(player: Player):
+    if not getUpgradeCost(player):
+        return False
     if player.trustPoint - getUpgradeCost(player) < 0:
         return False
     return True
@@ -54,3 +56,19 @@ def getPointName(player: Player) -> str:
                 return "3级玩家"
             case p if p > 27:
                 return "管理员或根玩家"
+
+
+def getMCDRPermissionLevel(player: Player) -> int:
+    if player.isRootPlayer:
+        return None
+    elif player.trustPoint == 0:
+        return 0
+    else:
+        p = player.trustPoint
+        match p:
+            case p if 1 <= p < 13:
+                return 1
+            case p if 14 <= p <= 27:
+                return 2
+            case p if p > 27:
+                return None
