@@ -35,7 +35,7 @@ def getUpgradeAddInt(player: Player) -> int:
 
 
 def canUpgrade(player: Player):
-    if not getUpgradeCost(player):
+    if getUpgradeCost(player) == False:
         return False
     if player.trustPoint - getUpgradeCost(player) < 0:
         return False
