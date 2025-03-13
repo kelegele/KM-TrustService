@@ -134,9 +134,9 @@ def playerUpgradeConfirm(source: CommandSource, context: CommandContext):
         updateAllPermissions()
 
 
-def playerUpgradeConfirmWrapper(*args, **kwargs):  # 方便后面加守卫语句
+def playerUpgradeConfirmWrapper(v0, v1):  # 方便后面加守卫语句
     gctx.upgradeProcessing.acquire()
-    playerUpgradeConfirm(*args, **kwargs)
+    playerUpgradeConfirm(v0, v1)
     gctx.upgradeProcessing.release()
 
 
