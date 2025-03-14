@@ -8,7 +8,7 @@ from mcdreforged.minecraft.rtext.style import RColor
 from .classes import upgradeRequest
 
 from ...shared import gctx
-from ..permissionUtils.point import getUpgradeCost, getUpgradeAddInt, canUpgrade, getPointName
+from ..permissionUtils.point import getUpgradeCost, getUpgradeAddInt, canUpgrade, getPointName, getUpgradeLevel
 from ..permissionUtils import updateAllPermissions
 from ..configUtils import readPlayerInfo, Player, savePlayerInfo
 from ..configUtils import writeFile
@@ -74,7 +74,7 @@ def upgradePlayer(source: CommandSource, context: CommandContext):
             return
 
         req = upgradeRequest(playerStorageName, context['playerName'], getUpgradeCost(player), getUpgradeAddInt(player))
-        source.reply(f"您将花费{req.cost}信任点以为 {context['playerName']} 增加{req.add}信任点。确认请输入`!!ts confirm`")
+        source.reply(f"您将花费{req.cost}信任点以为 {context['playerName']} 增加{req.add}信任点。为对方升级后您的等级为{getUpgradeLevel(player)}确认请输入`!!ts confirm`")
         gctx.playerUpgradeAwaits[playerStorageName] = req
     elif source.is_console:
         source.reply(f"以控制台执行的upgrade子命令将以根玩家的权限执行(为目标增加17点数)。确认请输入`!!ts confirm`")
