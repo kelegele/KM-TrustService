@@ -8,6 +8,6 @@ class Context:
         self.playerLevelsConfigFileContent = dict()
 
         self.upgradeProcessing = Lock()
-        self.saveLock = Lock
+        self.saveLock = Lock()
         self.upgrade = Lock()
   
