@@ -17,6 +17,21 @@ def getUpgradeCost(player: Player) -> int:
             case p if p > 27:
                 return 0
 
+def getUpgradeLevel(player: Player) -> int:
+    UpgradedtrustPoint = player.trustPoint - getUpgradeCost(player)
+    if player.isRootPlayer:
+        return "根玩家"
+    elif UpgradedtrustPoint == 0:
+        return "1级玩家"
+    else:
+        p = UpgradedtrustPoint
+        match p:
+            case p if 1 <= p < 13:
+                return "2级玩家"
+            case p if 14 <= p <= 27:
+                return "3级玩家"
+            case p if p > 27:
+                return "管理员或根玩家"
 
 def getUpgradeAddInt(player: Player) -> int:
     if player.isRootPlayer:
@@ -35,8 +50,8 @@ def getUpgradeAddInt(player: Player) -> int:
 
 
 def canUpgrade(player: Player):
-    if not (getUpgradeCost(player) or player.isRootPlayer):
-        return False
+    if (player.isRootPlayer):
+        return True
     if player.trustPoint - getUpgradeCost(player) < 0:
         return False
     return True
