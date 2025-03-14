@@ -2,23 +2,14 @@
 from ..configUtils.classes import Player
 
 
-def getUpgradeCost(player: Player) -> int:
+def getUpgradeCost(addPoint: int) -> int:
     if player.isRootPlayer:
         return 0
-    elif player.trustPoint == 0:
-        return False
-    else:
-        p = player.trustPoint
-        match p:
-            case p if 1 <= p < 13:
-                return 5
-            case p if 14 <= p <= 27:
-                return 8
-            case p if p > 27:
-                return 0
+    costPoint = int(addPoint / 10) + addPoint
+    return cos
 
-def getUpgradeLevel(player: Player) -> int:
-    UpgradedtrustPoint = player.trustPoint - getUpgradeCost(player)
+def getUpgradeLevel(player: Player,costPoint: int) -> int:
+    UpgradedtrustPoint = player.trustPoint - costPoint
     if player.isRootPlayer:
         return "根玩家"
     elif UpgradedtrustPoint == 0:
@@ -49,10 +40,10 @@ def getUpgradeAddInt(player: Player) -> int:
                 return 8
 
 
-def canUpgrade(player: Player):
+def canUpgrade(player: Player, costPoint: int):
     if (player.isRootPlayer):
         return True
-    if player.trustPoint - getUpgradeCost(player) < 0:
+    if player.trustPoint - costPoint < 0:
         return False
     return True
 

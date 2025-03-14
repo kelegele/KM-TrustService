@@ -22,7 +22,7 @@ def printHelp(source: CommandSource, context: CommandContext):
         RText(" 玩家信任服务 帮助") + RText(" >", RColor.dark_purple)
     body = RText('''\
 !!ts: 输出本条消息
-!!ts upgrade <玩家名称>: 升级某个玩家，同时消耗你的信任点数''')
+!!ts upgrade <玩家名称> <点数>: 升级某个玩家，同时消耗你的信任点数''')
 
     if not source.is_console:
         try:
@@ -69,15 +69,17 @@ def upgradePlayer(source: CommandSource, context: CommandContext):
         except KeyError:
             source.reply(RText("您为1级玩家，无法升级！", RColor.red))
             return
+        addPoint = context['point']
+        costPoint=getUpgradeCost(addPoint)
         if not canUpgrade(player):
             source.reply(RText("您的信任点不足，无法升级！", RColor.red))
             return
 
-        req = upgradeRequest(playerStorageName, context['playerName'], getUpgradeCost(player), getUpgradeAddInt(player))
+        req = upgradeRequest(playerStorageName, context['playerName'], costPoint, addPoint)
         source.reply(f"您将花费{req.cost}信任点以为 {context['playerName']} 增加{req.add}信任点。为对方升级后您的等级为{getUpgradeLevel(player)}。确认请输入`!!ts confirm`")
         gctx.playerUpgradeAwaits[playerStorageName] = req
     elif source.is_console:
-        source.reply(f"以控制台执行的upgrade子命令将以根玩家的权限执行(为目标增加17点数)。确认请输入`!!ts confirm`")
+        source.reply(f"以控制台执行的upgrade子命令将以根玩家的权限执行(为目标增加{context['point']}点数)。确认请输入`!!ts confirm`")
 
 
 def playerUpgradeConfirm(source: CommandSource, context: CommandContext):
@@ -167,7 +169,7 @@ def getTSCmdBuilder():
     cmdBuilder = SimpleCommandBuilder()
 
     cmdBuilder.command("!!ts", printHelp)
-    cmdBuilder.command("!!ts upgrade <playerName>", upgradePlayer)
+    cmdBuilder.command("!!ts upgrade <playerName> <point>", upgradePlayer)
     cmdBuilder.command("!!ts confirm", playerUpgradeConfirmWrapper)
     cmdBuilder.command("!!ts save", savePermissionFile)
 
