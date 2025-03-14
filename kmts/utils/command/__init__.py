@@ -119,15 +119,19 @@ def playerUpgradeConfirm(source: CommandSource, context: CommandContext):
         if player2.isRootPlayer:
             source.reply(RText("不能给根玩家升级", RColor.red))
             return
+        if gctx.upgrade.acquire(False)
 
-        # 然后先扣钱
-        player1.trustPoint -= alreadyExistRequest.cost
-        savePlayerInfo(player1)
+          # 然后先扣钱
+          player1.trustPoint -= alreadyExistRequest.cost
+          savePlayerInfo(player1)
 
-        # 然后给target增加
-        player2.trustPoint = min(player2.trustPoint+alreadyExistRequest.add, 27)
-        savePlayerInfo(player2)
-
+          # 然后给target增加
+          player2.trustPoint = min(player2.trustPoint   +alreadyExistRequest.add, 27)
+          savePlayerInfo(player2)
+          gctx.upgrade.release()
+        else:
+          source.reply(RText("当前正在升级，请重试", RColor.red))
+          
         source.reply(RText(f"升级成功，对方现有 {player2.trustPoint} 信任点。", RColor.green))
         source.get_server().tell(alreadyExistRequest.targetPlayer, RText(
             f"{alreadyExistRequest.requestPlayer} 花费了 {alreadyExistRequest.cost}点信任点 给您 {alreadyExistRequest.add} 信任点。", RColor.green))
