@@ -49,6 +49,10 @@ def upgradePlayer(source: CommandSource, context: CommandContext):
     else:
         playerStorageName = source.player
 
+    if context['point'] <= 0:
+        source.reply(RText(f"不合法的数字!", RColor.red))
+        return
+
     alreadyExistRequest = gctx.playerUpgradeAwaits.get(playerStorageName, None)
 
     if alreadyExistRequest:
