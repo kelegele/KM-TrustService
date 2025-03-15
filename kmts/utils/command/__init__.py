@@ -141,7 +141,8 @@ def playerUpgradeConfirm(source: CommandSource, context: CommandContext):
             savePlayerInfo(player1)
 
             # 然后给target增加
-            player2.trustPoint = min(player2.trustPoint + alreadyExistRequest.add, 27)
+            player2.trustPoint = min(player2.trustPoint + alreadyExistRequest.add,
+                                     gctx.configFileContent['trustPointConfig']['max'])
             savePlayerInfo(player2)
             gctx.upgrade.release()
         else:
