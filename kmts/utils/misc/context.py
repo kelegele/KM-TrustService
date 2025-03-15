@@ -9,3 +9,5 @@ class Context:
 
         self.upgradeProcessing = Lock()
         self.saveLock = Lock()
+        self.upgrade = Lock()
+  

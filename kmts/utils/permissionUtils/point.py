@@ -2,20 +2,28 @@
 from ..configUtils.classes import Player
 
 
-def getUpgradeCost(player: Player) -> int:
+def getUpgradeCost(player, addPoint: int) -> int:
     if player.isRootPlayer:
         return 0
-    elif player.trustPoint == 0:
-        return False
+    costPoint = max(int(addPoint / 10) + addPoint, addPoint+1)
+    return costPoint
+
+
+def getUpgradeLevel(player: Player, costPoint: int) -> int:
+    UpgradedtrustPoint = player.trustPoint - costPoint
+    if player.isRootPlayer:
+        return "根玩家"
+    elif UpgradedtrustPoint == 0:
+        return "1级玩家"
     else:
-        p = player.trustPoint
+        p = UpgradedtrustPoint
         match p:
             case p if 1 <= p < 13:
-                return 5
+                return "2级玩家"
             case p if 14 <= p <= 27:
-                return 8
+                return "3级玩家"
             case p if p > 27:
-                return 0
+                return "管理员或根玩家"
 
 
 def getUpgradeAddInt(player: Player) -> int:
@@ -34,10 +42,10 @@ def getUpgradeAddInt(player: Player) -> int:
                 return 8
 
 
-def canUpgrade(player: Player):
-    if not (getUpgradeCost(player) or player.isRootPlayer):
-        return False
-    if player.trustPoint - getUpgradeCost(player) < 0:
+def canUpgrade(player: Player, costPoint: int):
+    if (player.isRootPlayer):
+        return True
+    if player.trustPoint - costPoint < 0:
         return False
     return True
 
@@ -72,3 +80,11 @@ def getMCDRPermissionLevel(player: Player) -> int:
                 return 2
             case p if p > 27:
                 return None
+
+
+def isUpgradeUseless(player1: Player, addPoint: int) -> bool:
+    if player1.isRootPlayer:
+        return True
+    elif player1.trustPoint + addPoint > 27:
+        return True
+    return False

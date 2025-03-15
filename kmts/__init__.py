@@ -13,7 +13,7 @@ import time
 
 def on_load(server: PluginServerInterface, _):
     server.logger.info(f'KMTS MCDR Plugin loaded: Version {VERSION[0]}.{VERSION[1]}.{VERSION[2]}')
-    server.logger.info("KMTS Copyright (c) wangyupu 2025. Publish under MIT License")
+    server.logger.info("KMTS Copyright (c) kmts Project contribuitors 2025. Publish under MIT License")
 
     initCommandSystem(server)
 
