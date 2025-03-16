@@ -8,13 +8,40 @@ defaultPermissionFile = {
     'players': {}
 }
 
+defaultConfigFile = {
+    'trustPointConfig': {
+        'max': 50,
+        'default': 0,
+        'rootPlayer': 30,
+        'levels': {
+            '2': {  # 取头取尾
+                'begin': 1,
+                'end': 13,
+            },
+            '3': {
+                'begin': 14,
+                'end': 27,
+            }
+        },
+        'upgrades': {
+            'cost': {
+                'mul': 0.1,
+                'min': 1
+            }
+        }
+    }
+}
+
 
 def readPlayerInfo(playerName) -> Player:
     # 读取基本信息
     try:
         rawInfo = gctx.playerLevelsConfigFileContent['players'][playerName]
     except KeyError:
-        raise KeyError("不存在的玩家")
+        rawInfo = {
+            'name': playerName,
+            'points': gctx.configFileContent['trustPointConfig']['default'],
+        }
 
     isRoot = False
     if rawInfo['name'] in gctx.playerLevelsConfigFileContent['rootPlayers']:
@@ -32,8 +59,11 @@ def savePlayerInfo(playerInfo: Player) -> None:
 
 def readFile():  # 插件加载时调用
     PSI: PluginServerInterface = ServerInterface.psi()
-    cfg = PSI.load_config_simple("permission.json", defaultPermissionFile)
-    gctx.playerLevelsConfigFileContent = cfg
+    permission = PSI.load_config_simple("permission.json", defaultPermissionFile)
+    gctx.playerLevelsConfigFileContent = permission
+
+    cfg = PSI.load_config_simple("config.json", defaultConfigFile)
+    gctx.configFileContent = cfg
 
 
 def writeFile():  # 插件卸载时调用

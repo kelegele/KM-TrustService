@@ -1,0 +1,41 @@
+name: build
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 处理Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: 安装 MCDReforged
+        run: pip install mcdreforged
+
+      - name: 打包插件
+        run: mcdreforged pack -n KMST_${{ github.event.head_commit.id }}.mcdr
+
+      - name: 提交文件
+        uses: actions/upload-artifact@v4
+        with:
+          name: "打包的插件"
+          path: |
+            KMST_${{ github.event.head_commit.id }}.mcdr
+
+      - name: 发布 Pre-release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+          files: KMST_${{ github.event.head_commit.id }}.mcdr
+          prerelease: true
+
+          target_commitish: ${{ github.event.head_commit.id }}
+
+          name: "提交 #${{ github.event.head_commit.id }} by ${{ github.event.head_commit.author }}"
+          body: "主分支提交: #${{ github.event.head_commit.id }}，作者：${{ github.event.head_commit.author }}\n提交信息：\n${{github.event.head_commit.message}}"
+          append_body: "注意：这是一个未确认发布的Pre-release。使用Latest最佳。"
