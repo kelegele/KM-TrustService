@@ -24,3 +24,18 @@ jobs:
           name: "打包的插件"
           path: |
             KMST_${{ github.event.head_commit.id }}.mcdr
+
+      - name: 发布 Pre-release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+          files: KMST_${{ github.event.head_commit.id }}.mcdr
+          prerelease: true
+
+          target_commitish: ${{ github.event.head_commit.id }}
+
+          name: "提交 #${{ github.event.head_commit.id }} by ${{ github.event.head_commit.author }}"
+          body: "主分支提交: #${{ github.event.head_commit.id }}，作者：${{ github.event.head_commit.author }}\n提交信息：\n${{github.event.head_commit.message}}"
+          append_body: "注意：这是一个未确认发布的Pre-release。使用Latest最佳。"
