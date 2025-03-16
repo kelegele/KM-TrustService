@@ -40,7 +40,7 @@ def readPlayerInfo(playerName) -> Player:
     except KeyError:
         rawInfo = {
             'name': playerName,
-            'points': 0,
+            'points': gctx.configFileContent['trustPointConfig']['default'],
         }
 
     isRoot = False
