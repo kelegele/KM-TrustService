@@ -38,7 +38,10 @@ def readPlayerInfo(playerName) -> Player:
     try:
         rawInfo = gctx.playerLevelsConfigFileContent['players'][playerName]
     except KeyError:
-        raise KeyError("不存在的玩家")
+        rawInfo = {
+            'name': playerName,
+            'points': 0,
+        }
 
     isRoot = False
     if rawInfo['name'] in gctx.playerLevelsConfigFileContent['rootPlayers']:

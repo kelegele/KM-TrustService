@@ -23,6 +23,7 @@ def on_load(server: PluginServerInterface, _):
         f"Success load permission file with {len(gctx.playerLevelsConfigFileContent['players'])} players.")
 
     server.logger.info(f"Found {len(gctx.playerLevelsConfigFileContent['rootPlayers'])} root players.")
+    server.logger.info(f"Root players: {', '.join(gctx.playerLevelsConfigFileContent['rootPlayers'])}")
 
     updateAllPermissions()
 
@@ -46,5 +47,6 @@ def autoSave():  # 自动保存
             writeFile()
             serverLogger.info("自动保存权限文件完成")
             gctx.saveLock.release()
-        else:  # 无法获得锁说明在退出过程
-            break
+        else:
+            serverLogger.info("Save lock was acquire. maybe in save. skip this save.")
+            continue
