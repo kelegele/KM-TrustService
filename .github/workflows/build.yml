@@ -33,6 +33,7 @@ jobs:
 
           files: KMST_${{ github.event.head_commit.id }}.mcdr
           prerelease: true
+          tag_name: "PRE-RELEASE ${{ github.event.head_commit.id }}"
 
           target_commitish: ${{ github.event.head_commit.id }}
 
