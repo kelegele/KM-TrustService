@@ -5,6 +5,7 @@ from .constants import VERSION
 from .utils.misc.context import Context
 from .utils.command import initCommandSystem
 from .shared import gctx
+from .utils.permissionUtils import updateAllPermissions
 
 from .utils.configUtils import readFile, writeFile
 from mcdreforged.api.decorator.new_thread import new_thread
@@ -20,6 +21,10 @@ def on_load(server: PluginServerInterface, _):
     readFile()
     server.logger.info(
         f"Success load permission file with {len(gctx.playerLevelsConfigFileContent['players'])} players.")
+
+    server.logger.info(f"Found {len(gctx.playerLevelsConfigFileContent['rootPlayers'])} root players.")
+
+    updateAllPermissions()
 
 
 def on_unload(server: PluginServerInterface):

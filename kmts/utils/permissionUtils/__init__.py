@@ -13,10 +13,14 @@ def setPermissionLevelForPlayer(playerName, targetLevel):
 
 def updateAllPermissions():
     server = ServerInterface.get_instance()
-
+    server.logger.info("Updating all permission...")
     for playerName, _ in gctx.playerLevelsConfigFileContent['players'].items():
         if server.get_permission_level(playerName) != getMCDRPermissionLevel(readPlayerInfo(playerName)):
+            server.logger.info(
+                f"Updating: {playerName} from {server.get_permission_level(playerName)} to {getMCDRPermissionLevel(readPlayerInfo(playerName))}")
             if server.get_permission_level(playerName) >= 3:
+                continue
+            elif not getMCDRPermissionLevel(readPlayerInfo(playerName)):
                 continue
             # 更新玩家权限，同时广播告知
             server.tell(playerName, RText(f"你现在是")+RText(getPointName(readPlayerInfo(playerName)),

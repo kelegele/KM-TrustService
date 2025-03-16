@@ -52,7 +52,7 @@ def getPointName(player: Player) -> str:
                 return "管理员或根玩家"
 
 
-def getMCDRPermissionLevel(player: Player) -> int:
+def getMCDRPermissionLevel(player: Player) -> int | None:
     if player.isRootPlayer:
         return None
     elif player.trustPoint == 0:

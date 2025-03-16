@@ -11,7 +11,7 @@ from ...shared import gctx
 from ..permissionUtils.point import getUpgradeCost, isUpgradeUseless, canUpgrade, getPointName, getUpgradeLevel
 from ..permissionUtils import updateAllPermissions
 from ..configUtils import readPlayerInfo, Player, savePlayerInfo
-from ..configUtils import writeFile
+from ..configUtils import writeFile, readFile
 
 
 def printHelp(source: CommandSource, context: CommandContext):
@@ -168,7 +168,7 @@ def playerPointSet(source: CommandSource, context: CommandContext):
         return
     player = Player(context['playerName'], False, context['point'])
     savePlayerInfo(player)
-    source.reply(RText(f"成功将玩家 {context['playerName']} 的点数设置为 {context['point']}", RColor.red))
+    source.reply(RText(f"成功将玩家 {context['playerName']} 的点数设置为 {context['point']}", RColor.green))
 
     updateAllPermissions()
 
@@ -185,6 +185,18 @@ def savePermissionFile(source: CommandSource, _):
         source.reply(RText("锁被占用了，可能正在进行自动保存。", RColor.red))
 
 
+def reloadPermissionFile(source: CommandSource, _):
+    if not source.has_permission_higher_than(2):
+        source.reply(RText("你没有权限执行这个操作！", RColor.red))
+        return
+    if gctx.saveLock.acquire(False):
+        readFile()
+        gctx.saveLock.release()
+        source.reply(RText("成功重载权限文件。", RColor.green))
+    else:
+        source.reply(RText("锁被占用了，可能正在进行自动保存或其它保存任务。", RColor.red))
+
+
 def getTSCmdBuilder():
     cmdBuilder = SimpleCommandBuilder()
 
@@ -192,6 +204,7 @@ def getTSCmdBuilder():
     cmdBuilder.command("!!ts upgrade <playerName> <point>", upgradePlayer)
     cmdBuilder.command("!!ts confirm", playerUpgradeConfirmWrapper)
     cmdBuilder.command("!!ts save", savePermissionFile)
+    cmdBuilder.command("!!ts reloadPermission", reloadPermissionFile)
 
     cmdBuilder.command("!!ts setPoint <playerName> <point>", playerPointSet)
 
