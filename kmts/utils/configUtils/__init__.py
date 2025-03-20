@@ -10,7 +10,7 @@ defaultPermissionFile = {
 
 defaultConfigFile = {
     'trustPointConfig': {
-        'max': 50,
+        'max': 27,
         'default': 0,
         'rootPlayer': 30,
         'levels': {
