@@ -27,7 +27,7 @@ jobs:
 
       - name: 准备日期和时间
         id: date
-        run: "::set-output name=tnow::$(date +'%Y-%m-%dT%H:%M:%S')"
+        run: echo "::set-output name=tnow::$(date +'%Y-%m-%dT%H:%M:%S')"
 
       - name: 发布 Pre-release
         uses: softprops/action-gh-release@v2
