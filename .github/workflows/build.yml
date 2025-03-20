@@ -25,6 +25,10 @@ jobs:
           path: |
             KMST_${{ github.event.head_commit.id }}.mcdr
 
+      - name: 准备日期和时间
+        id: date
+        run: "::set-output name=tnow::$(date +'%Y-%m-%dT%H:%M:%S')"
+
       - name: 发布 Pre-release
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
@@ -33,7 +37,7 @@ jobs:
 
           files: KMST_${{ github.event.head_commit.id }}.mcdr
           prerelease: true
-          tag_name: "PRE-RELEASE ${{ github.event.head_commit.id }}"
+          tag_name: "PRE-RELEASE_${{ steps.date.outputs.tnow }}"
 
           target_commitish: ${{ github.event.head_commit.id }}
 
