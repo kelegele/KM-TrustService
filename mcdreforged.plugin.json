@@ -1,10 +1,10 @@
 {
     "id": "kmts",
     "version": "1.0.0",
-    "name": "KeleMC Trust Serivce and Carpet command redirect",
-    "description": "KeleMC Trust Serivce and Carpet command redirect",
+    "name": "KeleMC Trust Serivce",
+    "description": "KeleMC Trust Serivce, dynamically sets player permissions based on server owner's trust.",
     "author": "wangyupu",
-    "link": "https://github.com/KeleMC/kmts",
+    "link": "https://github.com/KeleMC/KM-TrustService",
     "dependencies": {
         "mcdreforged": ">=2.0.0-alpha.1"
     }
